@@ -6,62 +6,35 @@ Share AI agent instructions across your team, regardless of which AI coding tool
 
 1. Clone this repository
 2. Pull latest changes: `git pull`
-3. Run install script: `./install.sh --tool <your-tool>`
-4. Agent instructions are installed globally to your tool's config
+3. Run the interactive installer: `./install.sh`
+4. Select your AI coding tool (Claude Code, Windsurf, or Cursor)
+5. Choose components to install (AGENTS.md, Skills, or both)
+6. Confirm installation
+
+The installer will:
+- Validate all files before installation (dry run)
+- Prompt before creating directories
+- Handle conflicts with existing files (overwrite/append/cancel)
+- Automatically install to the correct global location for your tool
+- Skip example-skill (template only, not installed)
 
 ---
 
 ## Global Installation Paths
 
-| Tool | File Name | Global Location | Format |
-|------|-----------|-----------------|--------|
-| **Claude Code** | `CLAUDE.md` | `~/.claude/CLAUDE.md` | Plain markdown |
-| **Windsurf** | `AGENTS.md` | `~/.codeium/windsurf/AGENTS.md` | Plain markdown |
-| **Cursor** | User Rules | Cursor Settings UI | Plain markdown |
+| Tool | AGENTS.md Location | Skills Location |
+|------|-------------------|-----------------|
+| **Claude Code** | `~/.claude/CLAUDE.md` | `~/.claude/skills/` |
+| **Windsurf** | `~/.codeium/windsurf/AGENTS.md` | `~/.codeium/windsurf/skills/` |
+| **Cursor** | Manual (Settings UI) | `~/.cursor/skills/` |
 
-### Claude Code
-```bash
-cp AGENTS.md ~/.claude/CLAUDE.md
-```
-- Plain markdown
-- Automatically loaded in every conversation
-
-### Windsurf
-```bash
-mkdir -p ~/.codeium/windsurf
-cp AGENTS.md ~/.codeium/windsurf/AGENTS.md
-```
-- Plain markdown
-- Case-insensitive (`AGENTS.md` or `agents.md`)
-
-### Cursor
-Cursor's global config is managed through Settings UI, not files.
-
-**Option 1: User Rules (Recommended)**
-1. Open Cursor Settings
-2. Go to "Cursor Settings" → "Rules for AI"
-3. Paste contents of `AGENTS.md`
-
-**Option 2: Team Rules (Enterprise)**
-- Managed via Cursor dashboard
-- Syncs automatically to all team members
-
----
-
-## Installation Script TODO
-
-The `install.sh` script will:
-1. Detect which tool to install for (or prompt user)
-2. Copy `AGENTS.md` to the appropriate global location
-3. Handle file naming (rename to `CLAUDE.md` for Claude Code)
-4. Backup existing files before overwriting
-5. Verify installation success
-
----
+**Note**: For Cursor, AGENTS.md must be manually copied to: Cursor Settings → Rules for AI
 
 ---
 
 ## Skills Format
+
+**Note**: The `skills/example-skill/` directory serves as a template/reference and is automatically excluded from installation. It demonstrates all optional components (scripts, references, assets, examples) that skills can include.
 
 ### Claude Code
 **Location**: `~/.claude/skills/<skill-name>/SKILL.md`
