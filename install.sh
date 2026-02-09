@@ -301,6 +301,8 @@ if [ "${component_states[1]}" -eq 1 ]; then
                 skills_target="$TARGET_DIR/skills"
                 if [ "$tool" == "Cursor" ]; then
                     skills_target="$HOME/.cursor/skills"
+                elif [ "$tool" == "Antigravity" ]; then
+                    skills_target="$HOME/.gemini/antigravity/skills"
                 fi
 
                 if [ -d "$skills_target" ]; then
@@ -497,12 +499,32 @@ case $tool in
             install_file "AGENTS.md" "$TARGET_DIR/GEMINI.md" "AGENTS.md"
         fi
 
-        # Skills (index 1) - Not supported for Antigravity
+        # Skills (index 1)
         if [ "${component_states[1]}" -eq 1 ]; then
-            echo ""
-            warning "Skills/Workflows not supported for Antigravity"
-            echo "  → Only GEMINI.md (global rules) installation is supported"
-            echo ""
+            if [ -d "skills" ]; then
+                mkdir -p "$TARGET_DIR/antigravity/skills"
+                skill_dirs=$(find skills -mindepth 1 -maxdepth 1 -type d)
+                if [ -n "$skill_dirs" ]; then
+                    installed_count=0
+                    while IFS= read -r skill_dir; do
+                        skill_name=$(basename "$skill_dir")
+                        if [ "$skill_name" != "example-skill" ]; then
+                            cp -r "$skill_dir" "$TARGET_DIR/antigravity/skills/"
+                            info "  → $skill_name"
+                            ((installed_count++))
+                        fi
+                    done <<< "$skill_dirs"
+                    if [ $installed_count -gt 0 ]; then
+                        success "Installed skills → ~/.gemini/antigravity/skills/"
+                    else
+                        warning "No skills to install (only example-skill found)"
+                    fi
+                else
+                    warning "No skill subdirectories found in skills/"
+                fi
+            else
+                warning "skills/ directory not found, skipping"
+            fi
         fi
 
         echo ""

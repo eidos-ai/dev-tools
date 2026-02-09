@@ -27,11 +27,9 @@ The installer will:
 | **Claude Code** | `~/.claude/CLAUDE.md` | `~/.claude/skills/` |
 | **Windsurf** | `~/.codeium/windsurf/AGENTS.md` | `~/.codeium/windsurf/skills/` |
 | **Cursor** | Manual (Settings UI) | `~/.cursor/skills/` |
-| **Antigravity** | `~/.gemini/GEMINI.md` | Not supported |
+| **Antigravity** | `~/.gemini/GEMINI.md` | `~/.gemini/antigravity/skills/` |
 
-**Notes**:
-- For Cursor, AGENTS.md must be manually copied to: Cursor Settings → Rules for AI
-- For Antigravity, only GEMINI.md (global rules) installation is supported. Workflows are not currently supported by this installer.
+**Note**: For Cursor, AGENTS.md must be manually copied to: Cursor Settings → Rules for AI
 
 ---
 
@@ -107,6 +105,34 @@ disable-model-invocation: false (optional)
 Detailed instructions...
 ```
 
+### Antigravity (Google Gemini Code Assist)
+**Location**: `~/.gemini/antigravity/skills/<skill-name>/SKILL.md`
+
+**Structure**:
+```
+~/.gemini/antigravity/skills/
+└── skill-name/
+    ├── SKILL.md (required - YAML + markdown)
+    ├── scripts/ (optional)
+    ├── examples/ (optional)
+    └── resources/ (optional)
+```
+
+**SKILL.md Format**:
+```yaml
+---
+name: skill-identifier (optional - defaults to folder name)
+description: What the skill does and when to use it (required)
+---
+
+Detailed instructions for the agent...
+```
+
+**Notes**:
+- The `name` field is optional and defaults to the folder name
+- The `description` field is required and should clearly explain when to use the skill
+- The agent automatically discovers and uses skills based on context
+
 ---
 
 ## Resources
@@ -118,3 +144,4 @@ Detailed instructions...
 - [Cursor: Rules documentation](https://cursor.com/docs/context/rules)
 - [Cursor: Agent Skills documentation](https://cursor.com/docs/context/skills)
 - [Antigravity: Rules & Workflows documentation](https://antigravity.google/docs/rules-workflows)
+- [Antigravity: Skills documentation](https://antigravity.google/docs/skills)
