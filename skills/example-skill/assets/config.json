@@ -1,0 +1,15 @@
+{
+  "name": "example-project",
+  "version": "1.0.0",
+  "environment": "development",
+  "features": {
+    "validation": true,
+    "deployment": false,
+    "monitoring": true
+  },
+  "settings": {
+    "timeout": 30,
+    "retries": 3,
+    "verbose": true
+  }
+}
