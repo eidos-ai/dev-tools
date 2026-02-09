@@ -7,7 +7,7 @@ Share AI agent instructions across your team, regardless of which AI coding tool
 1. Clone this repository
 2. Pull latest changes: `git pull`
 3. Run the interactive installer: `./install.sh`
-4. Select your AI coding tool (Claude Code, Windsurf, or Cursor)
+4. Select your AI coding tool (Claude Code, Windsurf, Cursor, or Antigravity)
 5. Choose components to install (AGENTS.md, Skills, or both)
 6. Confirm installation
 
@@ -27,8 +27,11 @@ The installer will:
 | **Claude Code** | `~/.claude/CLAUDE.md` | `~/.claude/skills/` |
 | **Windsurf** | `~/.codeium/windsurf/AGENTS.md` | `~/.codeium/windsurf/skills/` |
 | **Cursor** | Manual (Settings UI) | `~/.cursor/skills/` |
+| **Antigravity** | `~/.gemini/GEMINI.md` | Not supported |
 
-**Note**: For Cursor, AGENTS.md must be manually copied to: Cursor Settings → Rules for AI
+**Notes**:
+- For Cursor, AGENTS.md must be manually copied to: Cursor Settings → Rules for AI
+- For Antigravity, only GEMINI.md (global rules) installation is supported. Workflows are not currently supported by this installer.
 
 ---
 
@@ -114,3 +117,4 @@ Detailed instructions...
 - [Windsurf: Skills documentation](https://docs.windsurf.com/windsurf/cascade/skills)
 - [Cursor: Rules documentation](https://cursor.com/docs/context/rules)
 - [Cursor: Agent Skills documentation](https://cursor.com/docs/context/skills)
+- [Antigravity: Rules & Workflows documentation](https://antigravity.google/docs/rules-workflows)

@@ -122,11 +122,11 @@ install_file() {
 # Step 1: Select IDE/CLI
 echo -e "${BOLD}Step 1: Select your AI coding tool${RESET}"
 echo ""
-PS3="$(echo -e ${CYAN}Choose option \(1-3\): ${RESET})"
-options=("Claude Code" "Windsurf" "Cursor")
+PS3="$(echo -e ${CYAN}Choose option \(1-4\): ${RESET})"
+options=("Claude Code" "Windsurf" "Cursor" "Antigravity")
 select tool in "${options[@]}"; do
     case $tool in
-        "Claude Code"|"Windsurf"|"Cursor")
+        "Claude Code"|"Windsurf"|"Cursor"|"Antigravity")
             success "Selected: $tool"
             echo ""
             break
@@ -252,6 +252,10 @@ case $tool in
     "Cursor")
         TARGET_DIR=""
         TARGET_FILE=""
+        ;;
+    "Antigravity")
+        TARGET_DIR="$HOME/.gemini"
+        TARGET_FILE="$TARGET_DIR/GEMINI.md"
         ;;
 esac
 
@@ -482,6 +486,27 @@ case $tool in
 
         echo ""
         success "Installation complete for Cursor!"
+        ;;
+
+    "Antigravity")
+        TARGET_DIR="$HOME/.gemini"
+        ensure_directory "$TARGET_DIR" "Antigravity configuration"
+
+        # AGENTS.md (index 0)
+        if [ "${component_states[0]}" -eq 1 ]; then
+            install_file "AGENTS.md" "$TARGET_DIR/GEMINI.md" "AGENTS.md"
+        fi
+
+        # Skills (index 1) - Not supported for Antigravity
+        if [ "${component_states[1]}" -eq 1 ]; then
+            echo ""
+            warning "Skills/Workflows not supported for Antigravity"
+            echo "  → Only GEMINI.md (global rules) installation is supported"
+            echo ""
+        fi
+
+        echo ""
+        success "Installation complete for Antigravity!"
         ;;
 esac
 
