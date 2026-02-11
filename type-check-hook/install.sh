@@ -29,70 +29,70 @@ echo -e "${GREEN}✓${NC} Claude Code CLI found"
 echo ""
 
 # Function to browse directories
+# All display goes to /dev/tty, only final selection goes to stdout
 browse_directory() {
-    # Start from ~/Code if it exists, otherwise $HOME
     local current_dir="$HOME/Code"
     [ ! -d "$current_dir" ] && current_dir="$HOME"
     
     while true; do
-        clear
-        echo -e "${CYAN}════════════════════════════════════════${NC}"
-        echo -e "${CYAN}  Directory Browser${NC}"
-        echo -e "${CYAN}════════════════════════════════════════${NC}"
-        echo ""
-        echo "Current: $current_dir"
-        echo ""
-        
-        # Check if current directory is a git repo
-        if [ -d "$current_dir/.git" ]; then
-            echo -e "${GREEN}✓ This is a git repository${NC}"
+        clear > /dev/tty
+        {
+            echo -e "${CYAN}════════════════════════════════════════${NC}"
+            echo -e "${CYAN}  Directory Browser${NC}"
+            echo -e "${CYAN}════════════════════════════════════════${NC}"
             echo ""
-        fi
+            echo "Current: $current_dir"
+            echo ""
+            
+            if [ -d "$current_dir/.git" ]; then
+                echo -e "${GREEN}✓ This is a git repository${NC}"
+                echo ""
+            fi
+            
+            echo "Directories:"
+            echo "─────────────────────────────────────────"
+        } > /dev/tty
         
-        echo "Directories:"
-        echo "─────────────────────────────────────────"
-        
-        # List directories
         local dirs=()
         local i=1
         
-        # Add parent directory option if not at root
         if [ "$current_dir" != "/" ]; then
-            echo "  0) ⬆️  .. (go to parent directory)"
+            echo "  0) ⬆️  .. (go to parent directory)" > /dev/tty
         fi
         
-        # List subdirectories - handle both files and no files
         local found_any=0
         while IFS= read -r dir; do
             [ -z "$dir" ] && continue
             local basename=$(basename "$dir")
             local is_git=""
             [ -d "$dir/.git" ] && is_git=" ${GREEN}[git]${NC}"
-            printf "  %2d) 📁 %s%b\n" $i "$basename" "$is_git"
+            printf "  %2d) 📁 %s%b\n" $i "$basename" "$is_git" > /dev/tty
             dirs+=("$dir")
             ((i++))
             found_any=1
         done < <(find "$current_dir" -maxdepth 1 -type d ! -path "$current_dir" ! -name ".*" 2>/dev/null | sort)
         
         if [ $found_any -eq 0 ]; then
-            echo "  (no subdirectories)"
+            echo "  (no subdirectories)" > /dev/tty
         fi
         
-        echo "─────────────────────────────────────────"
-        echo ""
-        echo "Navigation:"
-        echo "  • Type number → Enter that directory"
-        if [ "$current_dir" != "/" ]; then
-            echo "  • Type 0 → Go to parent directory"
-        fi
-        if [ -d "$current_dir/.git" ]; then
-            echo "  • Type 's' → Select this git repository"
-        fi
-        echo "  • Type 'm' → Enter path manually"
-        echo "  • Type 'q' → Quit installer"
-        echo ""
+        {
+            echo "─────────────────────────────────────────"
+            echo ""
+            echo "Navigation:"
+            echo "  • Type number → Enter that directory"
+            if [ "$current_dir" != "/" ]; then
+                echo "  • Type 0 → Go to parent directory"
+            fi
+            if [ -d "$current_dir/.git" ]; then
+                echo "  • Type 's' → Select this git repository"
+            fi
+            echo "  • Type 'm' → Enter path manually"
+            echo "  • Type 'q' → Quit installer"
+            echo ""
+        } > /dev/tty
         
-        read -p "Choice: " choice
+        read -p "Choice: " choice < /dev/tty 2> /dev/tty
         
         case $choice in
             0)
@@ -105,9 +105,8 @@ browse_directory() {
                     echo "$current_dir"
                     return 0
                 else
-                    echo ""
-                    echo -e "${RED}Not a git repository${NC}"
-                    read -p "Press Enter to continue..."
+                    echo -e "${RED}Not a git repository${NC}" > /dev/tty
+                    read -p "Press Enter to continue..." < /dev/tty
                 fi
                 ;;
             m|M)
@@ -115,17 +114,16 @@ browse_directory() {
                 return 0
                 ;;
             q|Q)
-                echo ""
-                echo "Installation cancelled"
+                echo "" > /dev/tty
+                echo "Installation cancelled" > /dev/tty
                 exit 0
                 ;;
             *)
                 if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
                     current_dir="${dirs[$((choice-1))]}"
                 else
-                    echo ""
-                    echo -e "${RED}Invalid choice${NC}"
-                    read -p "Press Enter to continue..."
+                    echo -e "${RED}Invalid choice${NC}" > /dev/tty
+                    read -p "Press Enter to continue..." < /dev/tty
                 fi
                 ;;
         esac
@@ -232,14 +230,5 @@ echo "  ✓ Type hint issues"
 echo "  ✓ Generic types (Dict[str, Any], etc.)"
 echo "  ✓ Hardcoded secrets and API keys"
 echo ""
-echo "To test it:"
-echo "  cd $TARGET_REPO"
-echo "  # Make a commit with Python files"
-echo "  git push"
-echo ""
-echo "To disable temporarily:"
-echo "  git push --no-verify"
-echo ""
-echo "To uninstall:"
-echo "  rm $TARGET_REPO/.git/hooks/pre-push"
-echo "  rm $TARGET_REPO/.claude/type-analysis-prompt.txt"
+echo "To disable temporarily: git push --no-verify"
+echo "To uninstall: rm $TARGET_REPO/.git/hooks/pre-push"
