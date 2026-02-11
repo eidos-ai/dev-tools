@@ -1,0 +1,6 @@
+# Test files at root (not in type-check-hook/)
+/test_good_types.py
+/test_bad_types.py
+/test_*.py
+
+# Test suite files are tracked in type-check-hook/tests/

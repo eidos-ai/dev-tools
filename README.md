@@ -1,147 +1,68 @@
-# Universal AGENTS.md Installer
+# Dev Tools
 
-Share AI agent instructions across your team, regardless of which AI coding tool each person uses.
+Collection of development tools and utilities for the team.
 
-## Usage
+## Available Tools
 
-1. Clone this repository
-2. Pull latest changes: `git pull`
-3. Run the interactive installer: `./install.sh`
-4. Select your AI coding tool (Claude Code, Windsurf, Cursor, or Antigravity)
-5. Choose components to install (AGENTS.md, Skills, or both)
-6. Confirm installation
+### 1. 🤖 AGENTS.md Installer
 
-The installer will:
-- Validate all files before installation (dry run)
-- Prompt before creating directories
-- Handle conflicts with existing files (overwrite/append/cancel)
-- Automatically install to the correct global location for your tool
-- Skip example-skill (template only, not installed)
+Universal installer for sharing AI coding guidelines across different AI tools (Claude Code, Windsurf, Cursor, Antigravity).
+
+**Location**: [`agents/`](agents/)
+
+**Quick start**:
+```bash
+cd agents
+./install.sh
+```
+
+[Read more →](agents/README.md)
 
 ---
 
-## Global Installation Paths
+### 2. 🔍 Python Type Check Hook
 
-| Tool | AGENTS.md Location | Skills Location |
-|------|-------------------|-----------------|
-| **Claude Code** | `~/.claude/CLAUDE.md` | `~/.claude/skills/` |
-| **Windsurf** | `~/.codeium/windsurf/AGENTS.md` | `~/.codeium/windsurf/skills/` |
-| **Cursor** | Manual (Settings UI) | `~/.cursor/skills/` |
-| **Antigravity** | `~/.gemini/GEMINI.md` | `~/.gemini/antigravity/skills/` |
+Intelligent pre-push git hook that analyzes Python code for type hints and security issues.
 
-**Note**: For Cursor, AGENTS.md must be manually copied to: Cursor Settings → Rules for AI
+**Location**: [`type-check-hook/`](type-check-hook/)
+
+**Features**:
+- ✅ Type hint analysis
+- ✅ Detects Dict[str, Any] and generic types
+- ✅ Security checks (hardcoded secrets, API keys)
+- ✅ AI-powered with Claude
+- ✅ Fast (only analyzes changed files)
+
+**Quick start**:
+```bash
+cd type-check-hook
+./install.sh
+```
+
+[Read more →](type-check-hook/README.md)
 
 ---
 
-## Skills Format
+## Installation
 
-**Note**: The `skills/example-skill/` directory serves as a template/reference and is automatically excluded from installation. It demonstrates all optional components (scripts, references, assets, examples) that skills can include.
+Each tool has its own installation script. Navigate to the tool's directory and run `./install.sh`.
 
-### Claude Code
-**Location**: `~/.claude/skills/<skill-name>/SKILL.md`
+## Requirements
 
-**Structure**:
-```
-~/.claude/skills/
-└── skill-name/
-    ├── SKILL.md (required - YAML + markdown)
-    ├── template.md (optional)
-    ├── examples/ (optional)
-    └── scripts/ (optional)
-```
+- **AGENTS.md Installer**: Bash shell
+- **Type Check Hook**:
+  - Git repository
+  - Claude Code CLI ([install](https://github.com/anthropics/claude-code))
+  - Python projects
 
-**SKILL.md Format**:
-```yaml
----
-name: skill-identifier
-description: What this skill does and when to use it
----
+## Contributing
 
-Your skill instructions in markdown...
-```
+When adding new tools:
+1. Create a new directory for the tool
+2. Include README.md with usage instructions
+3. Include install.sh if installation is needed
+4. Update this main README
 
-### Windsurf
-**Location**: `~/.codeium/windsurf/skills/<skill-name>/SKILL.md`
+## License
 
-**Structure**:
-```
-~/.codeium/windsurf/skills/
-└── skill-name/
-    ├── SKILL.md (required - YAML + markdown)
-    └── supporting-files.* (optional)
-```
-
-**SKILL.md Format**:
-```yaml
----
-name: skill-identifier
-description: Brief explanation of purpose
----
-
-Skill content and instructions...
-```
-
-### Cursor
-**Location**: `~/.cursor/skills/<skill-name>/` or `~/.claude/skills/<skill-name>/`
-
-**Structure**:
-```
-~/.cursor/skills/
-└── skill-name/
-    ├── SKILL.md (required - YAML + markdown)
-    ├── scripts/ (optional)
-    ├── references/ (optional)
-    └── assets/ (optional)
-```
-
-**SKILL.md Format**:
-```yaml
----
-name: skill-identifier
-description: Brief description and usage context
-disable-model-invocation: false (optional)
----
-
-Detailed instructions...
-```
-
-### Antigravity (Google Gemini Code Assist)
-**Location**: `~/.gemini/antigravity/skills/<skill-name>/SKILL.md`
-
-**Structure**:
-```
-~/.gemini/antigravity/skills/
-└── skill-name/
-    ├── SKILL.md (required - YAML + markdown)
-    ├── scripts/ (optional)
-    ├── examples/ (optional)
-    └── resources/ (optional)
-```
-
-**SKILL.md Format**:
-```yaml
----
-name: skill-identifier (optional - defaults to folder name)
-description: What the skill does and when to use it (required)
----
-
-Detailed instructions for the agent...
-```
-
-**Notes**:
-- The `name` field is optional and defaults to the folder name
-- The `description` field is required and should clearly explain when to use the skill
-- The agent automatically discovers and uses skills based on context
-
----
-
-## Resources
-
-- [Claude Code: Using CLAUDE.md files](https://claude.com/blog/using-claude-md-files)
-- [Claude Code: Skills documentation](https://code.claude.com/docs/en/skills)
-- [Windsurf: AGENTS.md documentation](https://docs.windsurf.com/windsurf/cascade/agents-md)
-- [Windsurf: Skills documentation](https://docs.windsurf.com/windsurf/cascade/skills)
-- [Cursor: Rules documentation](https://cursor.com/docs/context/rules)
-- [Cursor: Agent Skills documentation](https://cursor.com/docs/context/skills)
-- [Antigravity: Rules & Workflows documentation](https://antigravity.google/docs/rules-workflows)
-- [Antigravity: Skills documentation](https://antigravity.google/docs/skills)
+Internal team tools - not for external distribution.

@@ -1,0 +1,124 @@
+#!/bin/bash
+# .git/hooks/pre-push
+# Analyzes Python files for type hint issues before pushing
+
+# Colors for output
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+echo -e "${BLUE}🔍 Pre-push Type Hint Analysis${NC}"
+echo ""
+
+# Read push details from stdin
+while read local_ref local_sha remote_ref remote_sha; do
+    # Handle edge case: deleted branch
+    if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+        echo -e "${GREEN}✓${NC} Deleting branch, skipping analysis"
+        exit 0
+    fi
+
+    # Determine comparison range
+    if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+        # New branch - compare against main/master
+        if git rev-parse --verify origin/main >/dev/null 2>&1; then
+            range="origin/main...$local_sha"
+        elif git rev-parse --verify origin/master >/dev/null 2>&1; then
+            range="origin/master...$local_sha"
+        else
+            # No main/master, compare all commits
+            range="$local_sha"
+        fi
+    else
+        # Existing branch - compare against remote version
+        range="$remote_sha..$local_sha"
+    fi
+
+    # Get changed Python files (Added, Copied, Modified)
+    CHANGED_FILES=$(git diff --name-only --diff-filter=ACM $range 2>/dev/null | grep '\.py$' || true)
+
+    # Skip if no Python files changed
+    if [ -z "$CHANGED_FILES" ]; then
+        echo -e "${GREEN}✓${NC} No Python files changed, skipping type analysis"
+        exit 0
+    fi
+
+    # Show which files will be analyzed
+    echo -e "${YELLOW}Analyzing Python files:${NC}"
+    echo "$CHANGED_FILES" | while read file; do
+        echo "  • $file"
+    done
+    echo ""
+
+    # Run Claude analysis
+    echo -e "${YELLOW}Running intelligent type hint and security analysis...${NC}"
+    echo ""
+
+    # Load prompt from file
+    PROMPT_FILE="$(git rev-parse --show-toplevel)/.claude/type-analysis-prompt.txt"
+    if [ -f "$PROMPT_FILE" ]; then
+        PROMPT=$(cat "$PROMPT_FILE" | sed "s|{FILES}|$CHANGED_FILES|g")
+    else
+        # Fallback if prompt file not found
+        PROMPT="Analyze these Python files for type hint issues: $CHANGED_FILES"
+    fi
+
+    REPORT=$(claude --print --model haiku "$PROMPT" 2>&1)
+
+    # Display the report
+    echo "$REPORT"
+    echo ""
+
+    # Check if analysis found actual issues
+    if echo "$REPORT" | grep -qiE "All files passed|No issues"; then
+        # No issues - proceed silently
+        echo -e "${GREEN}✓${NC} Type hints look great!"
+    elif echo "$REPORT" | grep -qiE "Location:|Problem:|Suggestion:"; then
+        # Issues found - prompt user
+        echo -e "${YELLOW}⚠️  Type hint issues found.${NC}"
+        echo ""
+
+        # Try to read from /dev/tty, fallback to stdin if not available
+        if [ -r /dev/tty ]; then
+            read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+        else
+            # Fallback: auto-cancel if can't prompt
+            echo "Cannot prompt for confirmation (no TTY available)"
+            echo -e "${RED}❌ Push cancelled.${NC}"
+            echo "Fix the issues above and try again, or use --no-verify to skip"
+            exit 1
+        fi
+        echo ""
+
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo -e "${RED}❌ Push cancelled.${NC}"
+            echo "Fix the issues above and try again."
+            exit 1
+        fi
+
+        echo -e "${GREEN}✓${NC} Proceeding with push..."
+    else
+        # Unclear response - let user decide
+        echo -e "${YELLOW}⚠️  Unable to parse analysis results.${NC}"
+
+        # Try to read from /dev/tty, fallback to stdin if not available
+        if [ -r /dev/tty ]; then
+            read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+        else
+            # Fallback: auto-cancel if can't prompt
+            echo "Cannot prompt for confirmation (no TTY available)"
+            echo -e "${RED}❌ Push cancelled.${NC}"
+            exit 1
+        fi
+        echo ""
+
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo -e "${RED}❌ Push cancelled.${NC}"
+            exit 1
+        fi
+    fi
+done
+
+exit 0

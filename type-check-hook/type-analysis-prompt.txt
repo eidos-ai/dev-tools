@@ -1,0 +1,36 @@
+Analyze these Python files for type hint issues and security concerns:
+
+Files to check:
+{FILES}
+
+Check for:
+1. Missing type hints on functions/methods/parameters
+2. Generic types (Dict, Any, List, Tuple, dict, list without parameters) that should be Pydantic models or dataclasses
+3. Functions returning Dict[str, Any] or plain dict instead of structured types
+4. Missing EmailStr or other Pydantic validators where applicable
+5. Plain dicts used for structured data instead of Pydantic models
+6. SECURITY: Hardcoded API keys, passwords, secrets, or tokens
+7. SECURITY: Exposed credentials (AWS keys, database passwords, etc.)
+8. SECURITY: Any sensitive data that should be in environment variables
+
+IMPORTANT OUTPUT FORMAT:
+- If a file has NO issues, output NOTHING for that file (silent pass)
+- If a file has issues, list them as numbered items:
+  1. Location: file.py:line
+     Problem: Brief description
+     Suggestion: How to fix
+  2. Location: file.py:line
+     Problem: Brief description
+     Suggestion: How to fix
+- NO examples, NO code snippets, NO severity labels, NO issue titles
+- Keep it concise and actionable
+- For security issues, mark them as CRITICAL in the problem description
+
+If ALL files are clean, respond with: 'All files passed type hint checks.'
+
+Guidelines from CLAUDE.md:
+- Use Pydantic BaseModel for ALL structured data
+- Avoid Dict[str, Any] - use specific models
+- All functions must have type hints
+- Use Pydantic validators like EmailStr where appropriate
+- NEVER hardcode secrets - use environment variables
