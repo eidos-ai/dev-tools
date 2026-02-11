@@ -8,6 +8,7 @@ GREEN='\033[0;32m'
 RED='\033[0;31m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m'
 
 echo -e "${BLUE}Python Type Hint & Security Check Hook Installer${NC}"
@@ -27,9 +28,85 @@ fi
 echo -e "${GREEN}✓${NC} Claude Code CLI found"
 echo ""
 
-# Ask for target repository
-echo "Enter the path to your target repository:"
-read -p "Repository path: " TARGET_REPO
+# Function to find git repositories
+find_git_repos() {
+    echo -e "${CYAN}Searching for git repositories...${NC}"
+    
+    # Common development directories
+    SEARCH_DIRS=(
+        "$HOME/Code"
+        "$HOME/Projects"
+        "$HOME/dev"
+        "$HOME/Development"
+        "$HOME/workspace"
+        "$HOME/repos"
+    )
+    
+    REPOS=()
+    for dir in "${SEARCH_DIRS[@]}"; do
+        if [ -d "$dir" ]; then
+            while IFS= read -r repo; do
+                REPOS+=("$repo")
+            done < <(find "$dir" -maxdepth 3 -name ".git" -type d 2>/dev/null | sed 's|/.git$||')
+        fi
+    done
+    
+    echo "${REPOS[@]}"
+}
+
+# Ask user for selection method
+echo "How would you like to select the target repository?"
+echo ""
+echo "  1) Browse detected git repositories"
+echo "  2) Enter path manually"
+echo ""
+read -p "Choice (1-2): " CHOICE
+
+case $CHOICE in
+    1)
+        # Find and display repositories
+        REPOS=($(find_git_repos))
+        
+        if [ ${#REPOS[@]} -eq 0 ]; then
+            echo -e "${YELLOW}No git repositories found in common locations${NC}"
+            echo "Falling back to manual entry..."
+            echo ""
+            read -p "Repository path: " TARGET_REPO
+        else
+            echo ""
+            echo -e "${CYAN}Found ${#REPOS[@]} git repositories:${NC}"
+            echo ""
+            
+            for i in "${!REPOS[@]}"; do
+                REPO_NAME=$(basename "${REPOS[$i]}")
+                REPO_PATH="${REPOS[$i]}"
+                printf "  %2d) %s\n" $((i+1)) "$REPO_PATH"
+            done
+            
+            echo ""
+            echo "  0) Enter path manually"
+            echo ""
+            read -p "Select repository (0-${#REPOS[@]}): " REPO_CHOICE
+            
+            if [ "$REPO_CHOICE" -eq 0 ]; then
+                read -p "Repository path: " TARGET_REPO
+            elif [ "$REPO_CHOICE" -ge 1 ] && [ "$REPO_CHOICE" -le ${#REPOS[@]} ]; then
+                TARGET_REPO="${REPOS[$((REPO_CHOICE-1))]}"
+                echo -e "${GREEN}Selected:${NC} $TARGET_REPO"
+            else
+                echo -e "${RED}Invalid selection${NC}"
+                exit 1
+            fi
+        fi
+        ;;
+    2)
+        read -p "Repository path: " TARGET_REPO
+        ;;
+    *)
+        echo -e "${RED}Invalid choice${NC}"
+        exit 1
+        ;;
+esac
 
 # Expand ~ to home directory
 TARGET_REPO="${TARGET_REPO/#\~/$HOME}"
