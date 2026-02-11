@@ -254,8 +254,10 @@ if [ "$PY_COUNT" -gt 0 ]; then
         # Get relative paths for cleaner output
         FILE_LIST=$(echo "$PY_FILES" | while read f; do echo "${f#$TARGET_REPO/}"; done)
 
-        PROMPT=$(cat "$TARGET_REPO/.claude/type-analysis-prompt.txt" | sed "s|{FILES}|$FILE_LIST|g")
-        claude --print --model haiku "$PROMPT"
+        # Build prompt directly (sed breaks with multiline file lists)
+        PROMPT_TEMPLATE=$(cat "$TARGET_REPO/.claude/type-analysis-prompt.txt")
+        PROMPT="${PROMPT_TEMPLATE//\{FILES\}/$FILE_LIST}"
+        (cd "$TARGET_REPO" && claude --print --model haiku "$PROMPT")
 
         echo ""
         echo "─────────────────────────────────────────"
