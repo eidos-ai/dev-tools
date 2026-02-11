@@ -37,7 +37,10 @@ browse_directory() {
     
     while true; do
         clear
-        echo -e "${CYAN}Directory Browser${NC}"
+        echo -e "${CYAN}════════════════════════════════════════${NC}"
+        echo -e "${CYAN}  Directory Browser${NC}"
+        echo -e "${CYAN}════════════════════════════════════════${NC}"
+        echo ""
         echo "Current: $current_dir"
         echo ""
         
@@ -47,13 +50,16 @@ browse_directory() {
             echo ""
         fi
         
+        echo "Directories:"
+        echo "─────────────────────────────────────────"
+        
         # List directories
         local dirs=()
         local i=1
         
         # Add parent directory option if not at root
         if [ "$current_dir" != "/" ]; then
-            echo "  0) .. (parent directory)"
+            echo "  0) ⬆️  .. (go to parent directory)"
         fi
         
         # List subdirectories
@@ -61,24 +67,32 @@ browse_directory() {
             local basename=$(basename "$dir")
             local is_git=""
             [ -d "$dir/.git" ] && is_git=" ${GREEN}[git]${NC}"
-            printf "  %2d) %s%b\n" $i "$basename" "$is_git"
+            printf "  %2d) 📁 %s%b\n" $i "$basename" "$is_git"
             dirs+=("$dir")
             ((i++))
         done < <(find "$current_dir" -maxdepth 1 -type d -not -name ".*" 2>/dev/null | sort)
         
+        echo "─────────────────────────────────────────"
         echo ""
-        if [ -d "$current_dir/.git" ]; then
-            echo "  s) Select this directory"
+        echo "Navigation:"
+        echo "  • Type number → Enter that directory"
+        if [ "$current_dir" != "/" ]; then
+            echo "  • Type 0 → Go to parent directory"
         fi
-        echo "  m) Enter path manually"
-        echo "  q) Quit"
+        if [ -d "$current_dir/.git" ]; then
+            echo "  • Type 's' → Select this git repository"
+        fi
+        echo "  • Type 'm' → Enter path manually"
+        echo "  • Type 'q' → Quit installer"
         echo ""
         
         read -p "Choice: " choice
         
         case $choice in
             0)
-                current_dir="$(dirname "$current_dir")"
+                if [ "$current_dir" != "/" ]; then
+                    current_dir="$(dirname "$current_dir")"
+                fi
                 ;;
             s|S)
                 if [ -d "$current_dir/.git" ]; then
