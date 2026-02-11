@@ -232,3 +232,33 @@ echo "  ✓ Hardcoded secrets and API keys"
 echo ""
 echo "To disable temporarily: git push --no-verify"
 echo "To uninstall: rm $TARGET_REPO/.git/hooks/pre-push"
+echo ""
+
+# Offer full analysis
+PY_FILES=$(find "$TARGET_REPO" -name "*.py" -not -path "*/.*" -not -path "*/venv/*" -not -path "*/__pycache__/*" -not -path "*/node_modules/*" 2>/dev/null)
+PY_COUNT=$(echo "$PY_FILES" | grep -c "\.py$" 2>/dev/null || echo "0")
+
+if [ "$PY_COUNT" -gt 0 ]; then
+    echo "─────────────────────────────────────────"
+    echo ""
+    echo -e "Found ${CYAN}$PY_COUNT Python files${NC} in this repository."
+    echo ""
+    read -p "Run a full type hint analysis now? (y/n) " -n 1 -r
+    echo ""
+
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo ""
+        echo -e "${YELLOW}Running full analysis on all Python files...${NC}"
+        echo ""
+
+        # Get relative paths for cleaner output
+        FILE_LIST=$(echo "$PY_FILES" | while read f; do echo "${f#$TARGET_REPO/}"; done)
+
+        PROMPT=$(cat "$TARGET_REPO/.claude/type-analysis-prompt.txt" | sed "s|{FILES}|$FILE_LIST|g")
+        claude --print --model haiku "$PROMPT"
+
+        echo ""
+        echo "─────────────────────────────────────────"
+        echo -e "${GREEN}Full analysis complete!${NC}"
+    fi
+fi
