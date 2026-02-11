@@ -30,7 +30,7 @@ Intelligent pre-push git hook that analyzes Python code for type hints and secur
 - ✅ Type hint analysis
 - ✅ Detects Dict[str, Any] and generic types
 - ✅ Security checks (hardcoded secrets, API keys)
-- ✅ AI-powered with Claude
+- ✅ Supports Claude Code and Codex CLI
 - ✅ Fast (only analyzes changed files)
 
 **Quick start**:
@@ -52,7 +52,7 @@ Each tool has its own installation script. Navigate to the tool's directory and 
 - **AGENTS.md Installer**: Bash shell
 - **Type Check Hook**:
   - Git repository
-  - Claude Code CLI ([install](https://github.com/anthropics/claude-code))
+  - One of: [Claude Code](https://github.com/anthropics/claude-code) or [Codex CLI](https://github.com/openai/codex)
   - Python projects
 
 ## Contributing
