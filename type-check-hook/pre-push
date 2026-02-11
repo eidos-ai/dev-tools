@@ -12,6 +12,41 @@ NC='\033[0m'
 echo -e "${BLUE}🔍 Pre-push Type Hint Analysis${NC}"
 echo ""
 
+# Read CLI preference from config, fall back to auto-detection
+HOOKS_DIR="$(git rev-parse --show-toplevel)/.git/hooks"
+CONFIG_FILE="$HOOKS_DIR/type-check-config.conf"
+AI_CLI=""
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+fi
+
+case "$AI_CLI" in
+    claude)
+        AI_CMD="claude --print --model haiku"
+        AI_NAME="Claude Code"
+        ;;
+    codex)
+        AI_CMD="codex exec"
+        AI_NAME="Codex"
+        ;;
+    *)
+        # Auto-detect
+        if command -v claude &> /dev/null; then
+            AI_CMD="claude --print --model haiku"
+            AI_NAME="Claude Code"
+        elif command -v codex &> /dev/null; then
+            AI_CMD="codex exec"
+            AI_NAME="Codex"
+        else
+            echo -e "${YELLOW}⚠️  No AI CLI found (claude or codex). Skipping analysis.${NC}"
+            exit 0
+        fi
+        ;;
+esac
+
+echo -e "Using: ${AI_NAME}"
+echo ""
+
 # Read push details from stdin
 while read local_ref local_sha remote_ref remote_sha; do
     # Handle edge case: deleted branch
@@ -57,7 +92,7 @@ while read local_ref local_sha remote_ref remote_sha; do
     echo ""
 
     # Load prompt from file
-    PROMPT_FILE="$(git rev-parse --show-toplevel)/.claude/type-analysis-prompt.txt"
+    PROMPT_FILE="$HOOKS_DIR/type-analysis-prompt.txt"
     if [ -f "$PROMPT_FILE" ]; then
         PROMPT=$(cat "$PROMPT_FILE" | sed "s|{FILES}|$CHANGED_FILES|g")
     else
@@ -65,7 +100,7 @@ while read local_ref local_sha remote_ref remote_sha; do
         PROMPT="Analyze these Python files for type hint issues: $CHANGED_FILES"
     fi
 
-    REPORT=$(claude --print --model haiku "$PROMPT" 2>&1)
+    REPORT=$($AI_CMD "$PROMPT" 2>&1)
 
     # Display the report
     echo "$REPORT"
@@ -80,17 +115,19 @@ while read local_ref local_sha remote_ref remote_sha; do
         echo -e "${YELLOW}⚠️  Type hint issues found.${NC}"
         echo ""
 
-        # Try to read from /dev/tty, fallback to stdin if not available
         if [ -r /dev/tty ]; then
-            read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+            while true; do
+                read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+                echo ""
+                if [[ $REPLY =~ ^[YyNn]$ ]]; then break; fi
+                echo -e "${RED}Invalid input. Please press y or n.${NC}"
+            done
         else
-            # Fallback: auto-cancel if can't prompt
             echo "Cannot prompt for confirmation (no TTY available)"
             echo -e "${RED}❌ Push cancelled.${NC}"
             echo "Fix the issues above and try again, or use --no-verify to skip"
             exit 1
         fi
-        echo ""
 
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             echo -e "${RED}❌ Push cancelled.${NC}"
@@ -103,16 +140,18 @@ while read local_ref local_sha remote_ref remote_sha; do
         # Unclear response - let user decide
         echo -e "${YELLOW}⚠️  Unable to parse analysis results.${NC}"
 
-        # Try to read from /dev/tty, fallback to stdin if not available
         if [ -r /dev/tty ]; then
-            read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+            while true; do
+                read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+                echo ""
+                if [[ $REPLY =~ ^[YyNn]$ ]]; then break; fi
+                echo -e "${RED}Invalid input. Please press y or n.${NC}"
+            done
         else
-            # Fallback: auto-cancel if can't prompt
             echo "Cannot prompt for confirmation (no TTY available)"
             echo -e "${RED}❌ Push cancelled.${NC}"
             exit 1
         fi
-        echo ""
 
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             echo -e "${RED}❌ Push cancelled.${NC}"
