@@ -18,14 +18,42 @@ echo ""
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Check if Claude Code is installed
-if ! command -v claude &> /dev/null; then
-    echo -e "${RED}✗ Claude Code CLI not found${NC}"
-    echo "Please install Claude Code first: https://github.com/anthropics/claude-code"
+# Let user choose CLI
+echo "Which AI CLI do you want to use?"
+echo "  1) Claude Code"
+echo "  2) Codex CLI"
+echo ""
+read -p "Choice (1-2): " CLI_CHOICE
+
+case $CLI_CHOICE in
+    1)
+        AI_CLI="claude"
+        AI_CMD="claude --print --model haiku"
+        AI_NAME="Claude Code"
+        ;;
+    2)
+        AI_CLI="codex"
+        AI_CMD="codex exec"
+        AI_NAME="Codex"
+        ;;
+    *)
+        echo -e "${RED}Invalid choice${NC}"
+        exit 1
+        ;;
+esac
+
+if ! command -v "$AI_CLI" &> /dev/null; then
+    echo -e "${RED}✗ $AI_NAME is not installed${NC}"
+    echo "Install it from:"
+    if [ "$AI_CLI" = "claude" ]; then
+        echo "  https://github.com/anthropics/claude-code"
+    else
+        echo "  https://github.com/openai/codex"
+    fi
     exit 1
 fi
 
-echo -e "${GREEN}✓${NC} Claude Code CLI found"
+echo -e "${GREEN}✓${NC} $AI_NAME selected"
 echo ""
 
 # Function to browse directories
@@ -184,8 +212,12 @@ echo ""
 if [ -f "$TARGET_REPO/.git/hooks/pre-push" ]; then
     echo -e "${YELLOW}⚠️  Pre-push hook already exists${NC}"
     echo "Current hook will be backed up to: .git/hooks/pre-push.backup"
-    read -p "Continue? (y/n) " -n 1 -r
-    echo ""
+    while true; do
+        read -p "Continue? (y/n) " -n 1 -r
+        echo ""
+        if [[ $REPLY =~ ^[YyNn]$ ]]; then break; fi
+        echo -e "${RED}Invalid input. Please press y or n.${NC}"
+    done
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
         echo "Installation cancelled"
         exit 0
@@ -199,31 +231,39 @@ cp "$SCRIPT_DIR/pre-push" "$TARGET_REPO/.git/hooks/pre-push"
 chmod +x "$TARGET_REPO/.git/hooks/pre-push"
 echo -e "${GREEN}✓${NC} Hook installed to: $TARGET_REPO/.git/hooks/pre-push"
 
-# Create .claude directory if it doesn't exist
-mkdir -p "$TARGET_REPO/.claude"
+HOOKS_DIR="$TARGET_REPO/.git/hooks"
 
 # Check if prompt file already exists
-if [ -f "$TARGET_REPO/.claude/type-analysis-prompt.txt" ]; then
+if [ -f "$HOOKS_DIR/type-analysis-prompt.txt" ]; then
     echo -e "${YELLOW}⚠️  Prompt file already exists${NC}"
-    read -p "Overwrite? (y/n) " -n 1 -r
-    echo ""
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Skipping prompt installation"
+    while true; do
+        read -p "Overwrite? (y/n) " -n 1 -r
+        echo ""
+        if [[ $REPLY =~ ^[YyNn]$ ]]; then break; fi
+        echo -e "${RED}Invalid input. Please press y or n.${NC}"
+    done
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        cp "$SCRIPT_DIR/type-analysis-prompt.txt" "$HOOKS_DIR/type-analysis-prompt.txt"
+        echo -e "${GREEN}✓${NC} Prompt installed to: $HOOKS_DIR/type-analysis-prompt.txt"
     else
-        cp "$SCRIPT_DIR/type-analysis-prompt.txt" "$TARGET_REPO/.claude/type-analysis-prompt.txt"
-        echo -e "${GREEN}✓${NC} Prompt installed to: $TARGET_REPO/.claude/type-analysis-prompt.txt"
+        echo "Skipping prompt installation"
     fi
 else
-    cp "$SCRIPT_DIR/type-analysis-prompt.txt" "$TARGET_REPO/.claude/type-analysis-prompt.txt"
-    echo -e "${GREEN}✓${NC} Prompt installed to: $TARGET_REPO/.claude/type-analysis-prompt.txt"
+    cp "$SCRIPT_DIR/type-analysis-prompt.txt" "$HOOKS_DIR/type-analysis-prompt.txt"
+    echo -e "${GREEN}✓${NC} Prompt installed to: $HOOKS_DIR/type-analysis-prompt.txt"
 fi
+
+# Save CLI preference to config
+echo "AI_CLI=$AI_CLI" > "$HOOKS_DIR/type-check-config.conf"
+echo -e "${GREEN}✓${NC} Config saved to: $HOOKS_DIR/type-check-config.conf"
 
 echo ""
 echo -e "${GREEN}✅ Installation complete!${NC}"
 echo ""
 echo "What was installed:"
-echo "  • Pre-push hook: $TARGET_REPO/.git/hooks/pre-push"
-echo "  • Analysis prompt: $TARGET_REPO/.claude/type-analysis-prompt.txt"
+echo "  • Pre-push hook: $HOOKS_DIR/pre-push"
+echo "  • Analysis prompt: $HOOKS_DIR/type-analysis-prompt.txt"
+echo "  • CLI config: $HOOKS_DIR/type-check-config.conf"
 echo ""
 echo "The hook will now run on every 'git push' and check for:"
 echo "  ✓ Type hint issues"
@@ -243,8 +283,12 @@ if [ "$PY_COUNT" -gt 0 ]; then
     echo ""
     echo -e "Found ${CYAN}$PY_COUNT Python files${NC} in this repository."
     echo ""
-    read -p "Run a full type hint analysis now? (y/n) " -n 1 -r
-    echo ""
+    while true; do
+        read -p "Run a full type hint analysis now? (y/n) " -n 1 -r
+        echo ""
+        if [[ $REPLY =~ ^[YyNn]$ ]]; then break; fi
+        echo -e "${RED}Invalid input. Please press y or n.${NC}"
+    done
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo ""
@@ -255,9 +299,9 @@ if [ "$PY_COUNT" -gt 0 ]; then
         FILE_LIST=$(echo "$PY_FILES" | while read f; do echo "${f#$TARGET_REPO/}"; done)
 
         # Build prompt directly (sed breaks with multiline file lists)
-        PROMPT_TEMPLATE=$(cat "$TARGET_REPO/.claude/type-analysis-prompt.txt")
+        PROMPT_TEMPLATE=$(cat "$HOOKS_DIR/type-analysis-prompt.txt")
         PROMPT="${PROMPT_TEMPLATE//\{FILES\}/$FILE_LIST}"
-        (cd "$TARGET_REPO" && claude --print --model haiku "$PROMPT")
+        (cd "$TARGET_REPO" && $AI_CMD "$PROMPT")
 
         echo ""
         echo "─────────────────────────────────────────"

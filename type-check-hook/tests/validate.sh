@@ -11,6 +11,29 @@ NC='\033[0m'
 
 cd "$(dirname "$0")"
 
+# Read CLI preference from config, fall back to auto-detection
+REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+CONFIG_FILE="$REPO_ROOT/.git/hooks/type-check-config.conf"
+AI_CLI=""
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+fi
+
+case "$AI_CLI" in
+    claude) AI_CMD="claude --print --model haiku" ;;
+    codex)  AI_CMD="codex exec" ;;
+    *)
+        if command -v claude &> /dev/null; then
+            AI_CMD="claude --print --model haiku"
+        elif command -v codex &> /dev/null; then
+            AI_CMD="codex exec"
+        else
+            echo -e "${RED}No AI CLI found (claude or codex)${NC}"
+            exit 1
+        fi
+        ;;
+esac
+
 # Expected ~issues per file
 EXPECTED=(
     "domain_models.py:0"
@@ -24,7 +47,7 @@ echo ""
 
 ALL_FILES="domain_models.py user_service.py user_utils.py data_processor.py"
 PROMPT=$(cat ../type-analysis-prompt.txt | sed "s|{FILES}|$ALL_FILES|g")
-RESULT=$(claude --print --model haiku "$PROMPT" 2>&1)
+RESULT=$($AI_CMD "$PROMPT" 2>&1)
 
 echo "$RESULT"
 echo ""
