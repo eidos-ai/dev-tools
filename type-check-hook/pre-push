@@ -79,7 +79,17 @@ while read local_ref local_sha remote_ref remote_sha; do
         # Issues found - prompt user
         echo -e "${YELLOW}⚠️  Type hint issues found.${NC}"
         echo ""
-        read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+
+        # Try to read from /dev/tty, fallback to stdin if not available
+        if [ -r /dev/tty ]; then
+            read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+        else
+            # Fallback: auto-cancel if can't prompt
+            echo "Cannot prompt for confirmation (no TTY available)"
+            echo -e "${RED}❌ Push cancelled.${NC}"
+            echo "Fix the issues above and try again, or use --no-verify to skip"
+            exit 1
+        fi
         echo ""
 
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -92,7 +102,16 @@ while read local_ref local_sha remote_ref remote_sha; do
     else
         # Unclear response - let user decide
         echo -e "${YELLOW}⚠️  Unable to parse analysis results.${NC}"
-        read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+
+        # Try to read from /dev/tty, fallback to stdin if not available
+        if [ -r /dev/tty ]; then
+            read -p "Continue with push? (y/n) " -n 1 -r < /dev/tty
+        else
+            # Fallback: auto-cancel if can't prompt
+            echo "Cannot prompt for confirmation (no TTY available)"
+            echo -e "${RED}❌ Push cancelled.${NC}"
+            exit 1
+        fi
         echo ""
 
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
