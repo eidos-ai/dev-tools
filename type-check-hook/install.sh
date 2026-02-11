@@ -30,9 +30,8 @@ echo ""
 
 # Function to browse directories
 browse_directory() {
-    local current_dir="${1:-$HOME/Code}"
-    
-    # Fallback to home if directory doesn't exist
+    # Start from ~/Code if it exists, otherwise $HOME
+    local current_dir="$HOME/Code"
     [ ! -d "$current_dir" ] && current_dir="$HOME"
     
     while true; do
@@ -62,15 +61,22 @@ browse_directory() {
             echo "  0) ⬆️  .. (go to parent directory)"
         fi
         
-        # List subdirectories
+        # List subdirectories - handle both files and no files
+        local found_any=0
         while IFS= read -r dir; do
+            [ -z "$dir" ] && continue
             local basename=$(basename "$dir")
             local is_git=""
             [ -d "$dir/.git" ] && is_git=" ${GREEN}[git]${NC}"
             printf "  %2d) 📁 %s%b\n" $i "$basename" "$is_git"
             dirs+=("$dir")
             ((i++))
-        done < <(find "$current_dir" -maxdepth 1 -type d -not -name ".*" 2>/dev/null | sort)
+            found_any=1
+        done < <(find "$current_dir" -maxdepth 1 -type d ! -path "$current_dir" ! -name ".*" 2>/dev/null | sort)
+        
+        if [ $found_any -eq 0 ]; then
+            echo "  (no subdirectories)"
+        fi
         
         echo "─────────────────────────────────────────"
         echo ""
@@ -99,8 +105,9 @@ browse_directory() {
                     echo "$current_dir"
                     return 0
                 else
+                    echo ""
                     echo -e "${RED}Not a git repository${NC}"
-                    sleep 1
+                    read -p "Press Enter to continue..."
                 fi
                 ;;
             m|M)
@@ -108,14 +115,17 @@ browse_directory() {
                 return 0
                 ;;
             q|Q)
+                echo ""
+                echo "Installation cancelled"
                 exit 0
                 ;;
             *)
                 if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
                     current_dir="${dirs[$((choice-1))]}"
                 else
+                    echo ""
                     echo -e "${RED}Invalid choice${NC}"
-                    sleep 1
+                    read -p "Press Enter to continue..."
                 fi
                 ;;
         esac
@@ -132,8 +142,9 @@ read -p "Choice (1-2): " CHOICE
 
 case $CHOICE in
     1)
-        RESULT=$(browse_directory "$HOME/Code")
+        RESULT=$(browse_directory)
         if [ "$RESULT" = "manual" ]; then
+            clear
             echo ""
             read -p "Repository path: " TARGET_REPO
         else
