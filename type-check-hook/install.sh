@@ -28,75 +28,105 @@ fi
 echo -e "${GREEN}✓${NC} Claude Code CLI found"
 echo ""
 
-# Function to find git repositories
-find_git_repos() {
-    echo -e "${CYAN}Searching for git repositories...${NC}"
+# Function to browse directories
+browse_directory() {
+    local current_dir="${1:-$HOME/Code}"
     
-    # Common development directories
-    SEARCH_DIRS=(
-        "$HOME/Code"
-        "$HOME/Projects"
-        "$HOME/dev"
-        "$HOME/Development"
-        "$HOME/workspace"
-        "$HOME/repos"
-    )
+    # Fallback to home if directory doesn't exist
+    [ ! -d "$current_dir" ] && current_dir="$HOME"
     
-    REPOS=()
-    for dir in "${SEARCH_DIRS[@]}"; do
-        if [ -d "$dir" ]; then
-            while IFS= read -r repo; do
-                REPOS+=("$repo")
-            done < <(find "$dir" -maxdepth 3 -name ".git" -type d 2>/dev/null | sed 's|/.git$||')
+    while true; do
+        clear
+        echo -e "${CYAN}Directory Browser${NC}"
+        echo "Current: $current_dir"
+        echo ""
+        
+        # Check if current directory is a git repo
+        if [ -d "$current_dir/.git" ]; then
+            echo -e "${GREEN}✓ This is a git repository${NC}"
+            echo ""
         fi
+        
+        # List directories
+        local dirs=()
+        local i=1
+        
+        # Add parent directory option if not at root
+        if [ "$current_dir" != "/" ]; then
+            echo "  0) .. (parent directory)"
+        fi
+        
+        # List subdirectories
+        while IFS= read -r dir; do
+            local basename=$(basename "$dir")
+            local is_git=""
+            [ -d "$dir/.git" ] && is_git=" ${GREEN}[git]${NC}"
+            printf "  %2d) %s%b\n" $i "$basename" "$is_git"
+            dirs+=("$dir")
+            ((i++))
+        done < <(find "$current_dir" -maxdepth 1 -type d -not -name ".*" 2>/dev/null | sort)
+        
+        echo ""
+        if [ -d "$current_dir/.git" ]; then
+            echo "  s) Select this directory"
+        fi
+        echo "  m) Enter path manually"
+        echo "  q) Quit"
+        echo ""
+        
+        read -p "Choice: " choice
+        
+        case $choice in
+            0)
+                current_dir="$(dirname "$current_dir")"
+                ;;
+            s|S)
+                if [ -d "$current_dir/.git" ]; then
+                    echo "$current_dir"
+                    return 0
+                else
+                    echo -e "${RED}Not a git repository${NC}"
+                    sleep 1
+                fi
+                ;;
+            m|M)
+                echo "manual"
+                return 0
+                ;;
+            q|Q)
+                exit 0
+                ;;
+            *)
+                if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -lt "$i" ]; then
+                    current_dir="${dirs[$((choice-1))]}"
+                else
+                    echo -e "${RED}Invalid choice${NC}"
+                    sleep 1
+                fi
+                ;;
+        esac
     done
-    
-    echo "${REPOS[@]}"
 }
 
 # Ask user for selection method
 echo "How would you like to select the target repository?"
 echo ""
-echo "  1) Browse detected git repositories"
+echo "  1) Browse directories interactively"
 echo "  2) Enter path manually"
 echo ""
 read -p "Choice (1-2): " CHOICE
 
 case $CHOICE in
     1)
-        # Find and display repositories
-        REPOS=($(find_git_repos))
-        
-        if [ ${#REPOS[@]} -eq 0 ]; then
-            echo -e "${YELLOW}No git repositories found in common locations${NC}"
-            echo "Falling back to manual entry..."
+        RESULT=$(browse_directory "$HOME/Code")
+        if [ "$RESULT" = "manual" ]; then
             echo ""
             read -p "Repository path: " TARGET_REPO
         else
+            TARGET_REPO="$RESULT"
+            clear
+            echo -e "${GREEN}Selected:${NC} $TARGET_REPO"
             echo ""
-            echo -e "${CYAN}Found ${#REPOS[@]} git repositories:${NC}"
-            echo ""
-            
-            for i in "${!REPOS[@]}"; do
-                REPO_NAME=$(basename "${REPOS[$i]}")
-                REPO_PATH="${REPOS[$i]}"
-                printf "  %2d) %s\n" $((i+1)) "$REPO_PATH"
-            done
-            
-            echo ""
-            echo "  0) Enter path manually"
-            echo ""
-            read -p "Select repository (0-${#REPOS[@]}): " REPO_CHOICE
-            
-            if [ "$REPO_CHOICE" -eq 0 ]; then
-                read -p "Repository path: " TARGET_REPO
-            elif [ "$REPO_CHOICE" -ge 1 ] && [ "$REPO_CHOICE" -le ${#REPOS[@]} ]; then
-                TARGET_REPO="${REPOS[$((REPO_CHOICE-1))]}"
-                echo -e "${GREEN}Selected:${NC} $TARGET_REPO"
-            else
-                echo -e "${RED}Invalid selection${NC}"
-                exit 1
-            fi
         fi
         ;;
     2)
