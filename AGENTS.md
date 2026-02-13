@@ -4,9 +4,9 @@ This file is for AI agents to read and execute installations automatically. The 
 
 **IMPORTANT**: Before proceeding with any installation, you MUST ask the user which tool they want to install and any required configuration choices (marked with "ASK THE USER" below). Do NOT assume or skip these questions.
 
-**Fetching files**: This is a private repository. Use `gh` CLI to fetch files:
+**Fetching files**:
 ```bash
-gh api repos/eidos-ai/dev-tools/contents/<FILE_PATH> --jq '.content' | base64 -d > <OUTPUT_PATH>
+curl -fsSL https://raw.githubusercontent.com/eidos-ai/dev-tools/main/<FILE_PATH> -o <OUTPUT_PATH>
 ```
 
 ## Tool 1: AGENTS.md Installer
@@ -31,7 +31,7 @@ Installs AI coding guidelines to the user's global config.
 1. Ask the user which AI tool they use
 2. Fetch the source file:
    ```bash
-   gh api repos/eidos-ai/dev-tools/contents/agents/AGENTS.md --jq '.content' | base64 -d > /tmp/AGENTS.md
+   curl -fsSL https://raw.githubusercontent.com/eidos-ai/dev-tools/main/agents/AGENTS.md -o /tmp/AGENTS.md
    ```
 3. Create target directory if needed: `mkdir -p <TARGET_DIR>`
 4. If target file exists, back it up: `cp <TARGET> <TARGET>.backup`
@@ -61,13 +61,13 @@ The target repository is the current working directory. Validate that `.git` exi
 
 2. Fetch and install the hook:
    ```bash
-   gh api repos/eidos-ai/dev-tools/contents/type-check-hook/pre-push --jq '.content' | base64 -d > .git/hooks/pre-push
+   curl -fsSL https://raw.githubusercontent.com/eidos-ai/dev-tools/main/type-check-hook/pre-push -o .git/hooks/pre-push
    chmod +x .git/hooks/pre-push
    ```
 
 3. Fetch the prompt template:
    ```bash
-   gh api repos/eidos-ai/dev-tools/contents/type-check-hook/type-analysis-prompt.txt --jq '.content' | base64 -d > .git/hooks/type-analysis-prompt.txt
+   curl -fsSL https://raw.githubusercontent.com/eidos-ai/dev-tools/main/type-check-hook/type-analysis-prompt.txt -o .git/hooks/type-analysis-prompt.txt
    ```
 
 4. Create the config file with the chosen CLI:
