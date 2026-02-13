@@ -8,15 +8,15 @@ Open your AI agent inside the repository you want to install the tool on and use
 
 **Install the type check hook**:
 ```
-Fetch https://raw.githubusercontent.com/eidos-ai/dev-tools/main/AGENTS.md and follow the instructions to install the Python Type Check Hook on this repository. Use Claude Code as the AI CLI.
+Fetch https://raw.githubusercontent.com/eidos-ai/dev-tools/main/AGENTS.md and follow the instructions to install the Python Type Check Hook on this repository.
 ```
 
 **Install the coding guidelines**:
 ```
-Fetch https://raw.githubusercontent.com/eidos-ai/dev-tools/main/AGENTS.md and follow the instructions to install the AGENTS.md coding guidelines for Claude Code.
+Fetch https://raw.githubusercontent.com/eidos-ai/dev-tools/main/AGENTS.md and follow the instructions to install the AGENTS.md coding guidelines.
 ```
 
-Replace the AI tool with your preference (Claude Code, Codex CLI, or Cursor CLI).
+The agent will ask you which AI CLI or tool to use.
 
 ---
 

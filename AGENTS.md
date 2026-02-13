@@ -2,13 +2,15 @@
 
 This file is for AI agents to read and execute installations automatically. The user is expected to be inside the target repository already. Fetch source files from the raw URLs below — do not clone the repo.
 
+**IMPORTANT**: Before proceeding with any installation, you MUST ask the user which tool they want to install and any required configuration choices (marked with "ASK THE USER" below). Do NOT assume or skip these questions.
+
 **Base URL**: `https://raw.githubusercontent.com/eidos-ai/dev-tools/main`
 
 ## Tool 1: AGENTS.md Installer
 
 Installs AI coding guidelines to the user's global config.
 
-**Ask the user**: Which AI tool do you use?
+**ASK THE USER**: Which AI tool do you use? (Claude Code, Windsurf, Cursor, or Antigravity)
 
 **Source**: `<BASE_URL>/agents/AGENTS.md`
 
@@ -36,7 +38,7 @@ Installs AI coding guidelines to the user's global config.
 
 Installs an AI-powered pre-push git hook that analyzes Python files for type hint issues and hardcoded secrets.
 
-**Ask the user**: Which AI CLI? (`claude`, `codex`, or `cursor-agent`)
+**ASK THE USER**: Which AI CLI do you want to use? (Claude Code, Codex CLI, or Cursor CLI)
 
 The target repository is the current working directory. Validate that `.git` exists.
 
