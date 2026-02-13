@@ -34,7 +34,7 @@ case $CLI_CHOICE in
         ;;
     2)
         AI_CLI="codex"
-        AI_CMD="codex exec"
+        AI_CMD="codex exec -m gpt-5-codex-mini"
         AI_NAME="Codex"
         ;;
     3)

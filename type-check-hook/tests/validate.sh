@@ -21,13 +21,13 @@ fi
 
 case "$AI_CLI" in
     claude)       AI_CMD="claude --print --model haiku" ;;
-    codex)        AI_CMD="codex exec" ;;
+    codex)        AI_CMD="codex exec -m gpt-5-codex-mini" ;;
     cursor-agent) AI_CMD="cursor-agent -p --model gemini-3-flash" ;;
     *)
         if command -v claude &> /dev/null; then
             AI_CMD="claude --print --model haiku"
         elif command -v codex &> /dev/null; then
-            AI_CMD="codex exec"
+            AI_CMD="codex exec -m gpt-5-codex-mini"
         elif command -v cursor-agent &> /dev/null; then
             AI_CMD="cursor-agent -p --model gemini-3-flash"
         else
