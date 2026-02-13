@@ -30,7 +30,7 @@ case "$AI_CLI" in
         AI_NAME="Codex"
         ;;
     cursor-agent)
-        AI_CMD="cursor-agent -p"
+        AI_CMD="cursor-agent -p --model gemini-3-flash"
         AI_NAME="Cursor"
         ;;
     *)
@@ -42,7 +42,7 @@ case "$AI_CLI" in
             AI_CMD="codex exec"
             AI_NAME="Codex"
         elif command -v cursor-agent &> /dev/null; then
-            AI_CMD="cursor-agent -p"
+            AI_CMD="cursor-agent -p --model gemini-3-flash"
             AI_NAME="Cursor"
         else
             echo -e "${YELLOW}⚠️  No AI CLI found. Skipping analysis.${NC}"

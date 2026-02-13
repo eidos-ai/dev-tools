@@ -39,7 +39,7 @@ case $CLI_CHOICE in
         ;;
     3)
         AI_CLI="cursor-agent"
-        AI_CMD="cursor-agent -p"
+        AI_CMD="cursor-agent -p --model gemini-3-flash"
         AI_NAME="Cursor"
         ;;
     *)

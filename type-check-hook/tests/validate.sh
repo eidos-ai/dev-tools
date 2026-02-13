@@ -22,14 +22,14 @@ fi
 case "$AI_CLI" in
     claude)       AI_CMD="claude --print --model haiku" ;;
     codex)        AI_CMD="codex exec" ;;
-    cursor-agent) AI_CMD="cursor-agent -p" ;;
+    cursor-agent) AI_CMD="cursor-agent -p --model gemini-3-flash" ;;
     *)
         if command -v claude &> /dev/null; then
             AI_CMD="claude --print --model haiku"
         elif command -v codex &> /dev/null; then
             AI_CMD="codex exec"
         elif command -v cursor-agent &> /dev/null; then
-            AI_CMD="cursor-agent -p"
+            AI_CMD="cursor-agent -p --model gemini-3-flash"
         else
             echo -e "${RED}No AI CLI found${NC}"
             exit 1
