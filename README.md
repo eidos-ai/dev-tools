@@ -2,58 +2,72 @@
 
 Collection of development tools and utilities for the team.
 
-## Available Tools
+## Lazy Installation
 
-### 1. 🤖 AGENTS.md Installer
+Open your AI agent inside the repository you want to install the tool on and use one of these prompts:
 
-Universal installer for sharing AI coding guidelines across different AI tools (Claude Code, Windsurf, Cursor, Antigravity).
-
-**Location**: [`agents/`](agents/)
-
-**Quick start**:
-```bash
-cd agents
-./install.sh
+**Install the type check hook**:
+```
+Fetch https://raw.githubusercontent.com/eidos-ai/dev-tools/main/AGENTS.md and follow the instructions to install the Python Type Check Hook on this repository.
 ```
 
-[Read more →](agents/README.md)
+**Install the coding guidelines**:
+```
+Fetch https://raw.githubusercontent.com/eidos-ai/dev-tools/main/AGENTS.md and follow the instructions to install the AGENTS.md coding guidelines.
+```
+
+The agent will ask you which AI CLI or tool to use.
 
 ---
 
-### 2. 🔍 Python Type Check Hook
+## Available Tools
+
+### 1. Python Type Check Hook
 
 Intelligent pre-push git hook that analyzes Python code for type hints and security issues.
 
 **Location**: [`type-check-hook/`](type-check-hook/)
 
 **Features**:
-- ✅ Type hint analysis
-- ✅ Detects Dict[str, Any] and generic types
-- ✅ Security checks (hardcoded secrets, API keys)
-- ✅ Supports Claude Code, Codex CLI, and Cursor CLI
-- ✅ Fast (only analyzes changed files)
+- Type hint analysis
+- Detects Dict[str, Any] and generic types
+- Security checks (hardcoded secrets, API keys)
+- Supports Claude Code, Codex CLI, and Cursor CLI
+- Fast (only analyzes changed files)
 
-**Quick start**:
+**Manual install**:
 ```bash
 cd type-check-hook
 ./install.sh
 ```
 
-[Read more →](type-check-hook/README.md)
+[Read more](type-check-hook/README.md)
 
 ---
 
-## Installation
+### 2. AGENTS.md Installer
 
-Each tool has its own installation script. Navigate to the tool's directory and run `./install.sh`.
+Universal installer for sharing AI coding guidelines across different AI tools (Claude Code, Windsurf, Cursor, Antigravity).
+
+**Location**: [`agents/`](agents/)
+
+**Manual install**:
+```bash
+cd agents
+./install.sh
+```
+
+[Read more](agents/README.md)
+
+---
 
 ## Requirements
 
-- **AGENTS.md Installer**: Bash shell
 - **Type Check Hook**:
   - Git repository
   - One of: [Claude Code](https://github.com/anthropics/claude-code), [Codex CLI](https://github.com/openai/codex), or [Cursor CLI](https://cursor.com)
   - Python projects
+- **AGENTS.md Installer**: Bash shell
 
 ## Contributing
 
@@ -61,7 +75,7 @@ When adding new tools:
 1. Create a new directory for the tool
 2. Include README.md with usage instructions
 3. Include install.sh if installation is needed
-4. Update this main README
+4. Update this main README and AGENTS.md
 
 ## License
 
