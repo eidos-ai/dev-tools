@@ -20,15 +20,18 @@ if [ -f "$CONFIG_FILE" ]; then
 fi
 
 case "$AI_CLI" in
-    claude) AI_CMD="claude --print --model haiku" ;;
-    codex)  AI_CMD="codex exec" ;;
+    claude)       AI_CMD="claude --print --model haiku" ;;
+    codex)        AI_CMD="codex exec" ;;
+    cursor-agent) AI_CMD="cursor-agent -p" ;;
     *)
         if command -v claude &> /dev/null; then
             AI_CMD="claude --print --model haiku"
         elif command -v codex &> /dev/null; then
             AI_CMD="codex exec"
+        elif command -v cursor-agent &> /dev/null; then
+            AI_CMD="cursor-agent -p"
         else
-            echo -e "${RED}No AI CLI found (claude or codex)${NC}"
+            echo -e "${RED}No AI CLI found${NC}"
             exit 1
         fi
         ;;
