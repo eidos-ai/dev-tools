@@ -4,19 +4,19 @@ Collection of development tools and utilities for the team.
 
 ## Lazy Installation
 
-Share this repo with any AI agent and use one of these prompts:
+Open your AI agent inside the repository you want to install the tool on and use one of these prompts:
 
 **Install the type check hook**:
 ```
-Clone https://github.com/eidos-ai/dev-tools and read the AGENTS.md file. Install the Python Type Check Hook on my repository at ~/Code/my-project using Claude Code.
+Fetch https://raw.githubusercontent.com/eidos-ai/dev-tools/main/AGENTS.md and follow the instructions to install the Python Type Check Hook on this repository. Use Claude Code as the AI CLI.
 ```
 
 **Install the coding guidelines**:
 ```
-Clone https://github.com/eidos-ai/dev-tools and read the AGENTS.md file. Install the AGENTS.md coding guidelines for Claude Code.
+Fetch https://raw.githubusercontent.com/eidos-ai/dev-tools/main/AGENTS.md and follow the instructions to install the AGENTS.md coding guidelines for Claude Code.
 ```
 
-Replace the repo path and AI tool with your own. The agent will read [AGENTS.md](AGENTS.md) and follow the steps automatically.
+Replace the AI tool with your preference (Claude Code, Codex CLI, or Cursor CLI).
 
 ---
 

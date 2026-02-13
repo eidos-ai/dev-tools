@@ -1,27 +1,16 @@
 # Dev Tools - AI Agent Installation Guide
 
-This file is for AI agents to read and execute installations automatically. Do not use the interactive `install.sh` scripts — follow the steps below directly.
+This file is for AI agents to read and execute installations automatically. The user is expected to be inside the target repository already. Fetch source files from the raw URLs below — do not clone the repo.
 
-## Repository Layout
-
-```
-dev-tools/
-  agents/
-    AGENTS.md                        # AI coding guidelines
-  skills/
-    example-skill/                   # Template only, do not install
-  type-check-hook/
-    pre-push                         # Git hook script
-    type-analysis-prompt.txt         # LLM prompt template
-```
+**Base URL**: `https://raw.githubusercontent.com/eidos-ai/dev-tools/main`
 
 ## Tool 1: AGENTS.md Installer
 
-Copies AI coding guidelines to the user's global config.
+Installs AI coding guidelines to the user's global config.
 
 **Ask the user**: Which AI tool do you use?
 
-**Source file**: `agents/AGENTS.md`
+**Source**: `<BASE_URL>/agents/AGENTS.md`
 
 **Target paths**:
 
@@ -35,25 +24,11 @@ Copies AI coding guidelines to the user's global config.
 **Steps**:
 
 1. Ask the user which AI tool they use
-2. Create target directory if needed: `mkdir -p <TARGET_DIR>`
-3. If target file exists, back it up: `cp <TARGET> <TARGET>.backup`
-4. Copy: `cp <REPO>/agents/AGENTS.md <TARGET_PATH>`
-5. For Cursor: print the file contents and tell the user to paste into Cursor Settings > Rules for AI
-
-**Optional — Skills**:
-
-Copy each subdirectory from `skills/` EXCEPT `example-skill/`:
-
-| Tool         | Skills Target Path                    |
-|--------------|---------------------------------------|
-| Claude Code  | `~/.claude/skills/`                   |
-| Windsurf     | `~/.codeium/windsurf/skills/`         |
-| Cursor       | `~/.cursor/skills/`                   |
-| Antigravity  | `~/.gemini/antigravity/skills/`       |
-
-```bash
-cp -r <REPO>/skills/<skill_name> <SKILLS_TARGET>/<skill_name>
-```
+2. Fetch the source file: `curl -fsSL <BASE_URL>/agents/AGENTS.md -o /tmp/AGENTS.md`
+3. Create target directory if needed: `mkdir -p <TARGET_DIR>`
+4. If target file exists, back it up: `cp <TARGET> <TARGET>.backup`
+5. Copy to target: `cp /tmp/AGENTS.md <TARGET_PATH>`
+6. For Cursor: show the file contents and tell the user to paste into Cursor Settings > Rules for AI
 
 ---
 
@@ -61,37 +36,35 @@ cp -r <REPO>/skills/<skill_name> <SKILLS_TARGET>/<skill_name>
 
 Installs an AI-powered pre-push git hook that analyzes Python files for type hint issues and hardcoded secrets.
 
-**Ask the user**:
-1. Which AI CLI? (`claude`, `codex`, or `cursor-agent`)
-2. Absolute path to the target git repository
+**Ask the user**: Which AI CLI? (`claude`, `codex`, or `cursor-agent`)
 
-**Validate**: Confirm `<TARGET_REPO>/.git` exists.
+The target repository is the current working directory. Validate that `.git` exists.
 
 **Source files**:
-- `type-check-hook/pre-push`
-- `type-check-hook/type-analysis-prompt.txt`
+- `<BASE_URL>/type-check-hook/pre-push`
+- `<BASE_URL>/type-check-hook/type-analysis-prompt.txt`
 
 **Steps**:
 
-1. If `<TARGET_REPO>/.git/hooks/pre-push` exists, back it up:
+1. If `.git/hooks/pre-push` exists, back it up:
    ```bash
-   cp <TARGET_REPO>/.git/hooks/pre-push <TARGET_REPO>/.git/hooks/pre-push.backup
+   cp .git/hooks/pre-push .git/hooks/pre-push.backup
    ```
 
-2. Copy the hook:
+2. Fetch and install the hook:
    ```bash
-   cp <REPO>/type-check-hook/pre-push <TARGET_REPO>/.git/hooks/pre-push
-   chmod +x <TARGET_REPO>/.git/hooks/pre-push
+   curl -fsSL <BASE_URL>/type-check-hook/pre-push -o .git/hooks/pre-push
+   chmod +x .git/hooks/pre-push
    ```
 
-3. Copy the prompt template:
+3. Fetch the prompt template:
    ```bash
-   cp <REPO>/type-check-hook/type-analysis-prompt.txt <TARGET_REPO>/.git/hooks/type-analysis-prompt.txt
+   curl -fsSL <BASE_URL>/type-check-hook/type-analysis-prompt.txt -o .git/hooks/type-analysis-prompt.txt
    ```
 
-4. Create the config file:
+4. Create the config file with the chosen CLI:
    ```bash
-   echo "AI_CLI=<CHOSEN_CLI>" > <TARGET_REPO>/.git/hooks/type-check-config.conf
+   echo "AI_CLI=<CHOSEN_CLI>" > .git/hooks/type-check-config.conf
    ```
 
 **CLI reference**:
@@ -108,9 +81,9 @@ Installs an AI-powered pre-push git hook that analyzes Python files for type hin
 
 After type-check hook installation:
 ```bash
-ls -la <TARGET_REPO>/.git/hooks/pre-push
-ls -la <TARGET_REPO>/.git/hooks/type-analysis-prompt.txt
-ls -la <TARGET_REPO>/.git/hooks/type-check-config.conf
+ls -la .git/hooks/pre-push
+ls -la .git/hooks/type-analysis-prompt.txt
+ls -la .git/hooks/type-check-config.conf
 ```
 
 After AGENTS.md installation:
