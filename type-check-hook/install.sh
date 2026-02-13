@@ -22,8 +22,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "Which AI CLI do you want to use?"
 echo "  1) Claude Code"
 echo "  2) Codex CLI"
+echo "  3) Cursor CLI"
 echo ""
-read -p "Choice (1-2): " CLI_CHOICE
+read -p "Choice (1-3): " CLI_CHOICE
 
 case $CLI_CHOICE in
     1)
@@ -36,6 +37,11 @@ case $CLI_CHOICE in
         AI_CMD="codex exec"
         AI_NAME="Codex"
         ;;
+    3)
+        AI_CLI="cursor-agent"
+        AI_CMD="cursor-agent -p"
+        AI_NAME="Cursor"
+        ;;
     *)
         echo -e "${RED}Invalid choice${NC}"
         exit 1
@@ -45,11 +51,11 @@ esac
 if ! command -v "$AI_CLI" &> /dev/null; then
     echo -e "${RED}✗ $AI_NAME is not installed${NC}"
     echo "Install it from:"
-    if [ "$AI_CLI" = "claude" ]; then
-        echo "  https://github.com/anthropics/claude-code"
-    else
-        echo "  https://github.com/openai/codex"
-    fi
+    case "$AI_CLI" in
+        claude)       echo "  https://github.com/anthropics/claude-code" ;;
+        codex)        echo "  https://github.com/openai/codex" ;;
+        cursor-agent) echo "  https://cursor.com" ;;
+    esac
     exit 1
 fi
 

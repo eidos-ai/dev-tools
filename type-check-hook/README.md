@@ -7,7 +7,7 @@ AI-powered pre-push git hook that checks Python code for type hints and security
 - ✅ Type hint analysis (missing hints, generic types)
 - ✅ Security checks (hardcoded secrets, API keys)
 - ✅ Fast (only analyzes changed files)
-- ✅ Supports Claude Code and Codex CLI
+- ✅ Supports Claude Code, Codex CLI, and Cursor CLI
 
 ## Installation
 
@@ -82,4 +82,5 @@ rm .git/hooks/pre-push
 - One of:
   - [Claude Code](https://github.com/anthropics/claude-code)
   - [Codex CLI](https://github.com/openai/codex)
+  - [Cursor CLI](https://cursor.com)
 - Python files

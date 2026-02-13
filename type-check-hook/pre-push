@@ -29,6 +29,10 @@ case "$AI_CLI" in
         AI_CMD="codex exec"
         AI_NAME="Codex"
         ;;
+    cursor-agent)
+        AI_CMD="cursor-agent -p"
+        AI_NAME="Cursor"
+        ;;
     *)
         # Auto-detect
         if command -v claude &> /dev/null; then
@@ -37,8 +41,11 @@ case "$AI_CLI" in
         elif command -v codex &> /dev/null; then
             AI_CMD="codex exec"
             AI_NAME="Codex"
+        elif command -v cursor-agent &> /dev/null; then
+            AI_CMD="cursor-agent -p"
+            AI_NAME="Cursor"
         else
-            echo -e "${YELLOW}⚠️  No AI CLI found (claude or codex). Skipping analysis.${NC}"
+            echo -e "${YELLOW}⚠️  No AI CLI found. Skipping analysis.${NC}"
             exit 0
         fi
         ;;
