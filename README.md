@@ -6,17 +6,10 @@ Collection of development tools and utilities for the team.
 
 Open your AI agent inside the repository you want to install the tool on and use one of these prompts:
 
-**Install the type check hook**:
+Copy this URL into your AI agent:
 ```
-I want to install a pre-push git hook from our internal team repo (eidos-ai/dev-tools). This hook analyzes Python files for type hint issues and hardcoded secrets before pushing. It installs 3 files into .git/hooks/: a pre-push script, a prompt template, and a config file. Read the installation guide by running `gh api repos/eidos-ai/dev-tools/contents/AGENTS.md --jq '.content' | base64 -d` and follow the steps for "Tool 2: Python Type Check Hook". Ask me which AI CLI I want to use (Claude Code, Codex CLI, or Cursor CLI) before proceeding.
+https://gist.githubusercontent.com/emihrem/db71bd1f1177b86bf5d04d200945281e/raw/AGENTS.md
 ```
-
-**Install the coding guidelines**:
-```
-I want to install AI coding guidelines from our internal team repo (eidos-ai/dev-tools). This copies an AGENTS.md file with coding standards (type safety, naming conventions, error handling) to the appropriate config location for my AI tool. Read the installation guide by running `gh api repos/eidos-ai/dev-tools/contents/AGENTS.md --jq '.content' | base64 -d` and follow the steps for "Tool 1: AGENTS.md Installer". Ask me which AI tool I use (Claude Code, Windsurf, Cursor, or Antigravity) before proceeding.
-```
-
-Requires `gh` CLI authenticated with access to this repo.
 
 ---
 

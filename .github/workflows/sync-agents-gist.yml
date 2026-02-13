@@ -1,0 +1,18 @@
+name: Sync AGENTS.md to Gist
+
+on:
+  push:
+    branches: [main]
+    paths: [AGENTS.md]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update gist
+        env:
+          GH_TOKEN: ${{ secrets.GIST_PAT }}
+        run: |
+          gh gist edit db71bd1f1177b86bf5d04d200945281e -f AGENTS.md - < AGENTS.md
