@@ -8,7 +8,7 @@ Open your AI agent inside the repository you want to install the tool on and use
 
 Copy this URL into your AI agent:
 ```
-https://gist.githubusercontent.com/emihrem/db71bd1f1177b86bf5d04d200945281e/raw/AGENTS.md
+https://github.com/eidos-ai/dev-tools/blob/main/AGENTS.md
 ```
 
 ---
