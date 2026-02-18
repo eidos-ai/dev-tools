@@ -100,11 +100,11 @@ while read local_ref local_sha remote_ref remote_sha; do
 
     # Load prompt from file
     PROMPT_FILE="$HOOKS_DIR/type-analysis-prompt.txt"
+    FILES_ESCAPED=$(echo "$CHANGED_FILES" | tr '\n' ' ')
     if [ -f "$PROMPT_FILE" ]; then
-        PROMPT=$(cat "$PROMPT_FILE" | sed "s|{FILES}|$CHANGED_FILES|g")
+        PROMPT=$(sed "s|{FILES}|$FILES_ESCAPED|g" "$PROMPT_FILE")
     else
-        # Fallback if prompt file not found
-        PROMPT="Analyze these Python files for type hint issues: $CHANGED_FILES"
+        PROMPT="Analyze these Python files for type hint issues: $FILES_ESCAPED"
     fi
 
     REPORT=$($AI_CMD "$PROMPT" 2>&1)

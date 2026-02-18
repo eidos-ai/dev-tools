@@ -13,7 +13,7 @@ curl -fsSL https://raw.githubusercontent.com/eidos-ai/dev-tools/main/<FILE_PATH>
 
 Installs AI coding guidelines to the user's global config.
 
-**ASK THE USER**: Which AI tool do you use? (Claude Code, Windsurf, Cursor, or Antigravity)
+**ASK THE USER**: Which AI tool do you use? (Claude Code, Codex CLI, Windsurf, Cursor, or Antigravity)
 
 **Source file path**: `agents/AGENTS.md`
 
@@ -22,6 +22,7 @@ Installs AI coding guidelines to the user's global config.
 | Tool         | Target Path                          | Action     |
 |--------------|--------------------------------------|------------|
 | Claude Code  | `~/.claude/CLAUDE.md`                | Copy file  |
+| Codex CLI    | `~/.codex/AGENTS.md`                 | Copy file  |
 | Windsurf     | `~/.codeium/windsurf/AGENTS.md`      | Copy file  |
 | Cursor       | Cursor Settings > Rules for AI       | Paste content |
 | Antigravity  | `~/.gemini/GEMINI.md`                | Copy file  |
